@@ -1,0 +1,150 @@
+{% extends 'main/base.html' %}
+
+{% block 'title' %}
+    Магазин - Nukus Avto
+{% endblock %}
+
+{% block 'page_content' %}
+    <!-- Market Start -->
+    <div class="container">
+        <div class="row mt-5">
+            <h2>Авто запчасти</h2>
+        </div>
+        <div class="row mt-5">
+            <form method="get" action="" class="col-3">
+                <div class="">
+                    <h4>Марки авто</h4>
+                    <ul style="list-style: none; padding: 0;">
+                        {% for auto_mark in auto_marks %}
+                            <li>
+                                <input
+                                        type="checkbox"
+                                        name="mark_{{ auto_mark.id }}"
+                                        {% if auto_mark.id in selected_marks %}
+                                        checked
+                                        {% endif %}
+                                >
+                                {{ auto_mark.name }}
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                <div class="">
+                    <h4>Категории запчастей</h4>
+                    <ul style="list-style: none; padding: 0;">
+                        {% for item in auto_part_categories %}
+                            <li>
+                                <input
+                                        type="checkbox"
+                                        name="auto_part_category_{{ item.id }}"
+                                        {% if item.id in selected_categories %}
+                                        checked
+                                        {% endif %}
+                                >
+                                {{ item.name }}
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                <div class="w-100">
+                    <button class="btn btn-primary rounded-1 w-100" type="submit">Применить</button>
+                </div>
+            </form>
+            <div class="col-9">
+                <div class="d-flex gap-4 flex-wrap" style="padding-left: 30px;">
+                    {% for auto_part in auto_parts %}
+                        <div class="card" style="width: 18rem;">
+                            <div style="width: 286px; height: 286px; display: flex; justify-content: center; align-items: center;">
+                                <img
+                                        style="height: 100%; width: 100%;"
+                                        src="{{ auto_part.image.url }}"
+                                        class="card-img-top"
+                                        alt="..."
+                                >
+                            </div>
+                            <div class="card-body">
+                                <h5 class="card-title">{{ auto_part.name }}</h5>
+                                <p class="card-text">{{ auto_part.description }}</p>
+                            </div>
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item"><b>Марка авто</b>: {{ auto_part.auto_mark.name }}</li>
+                                <li class="list-group-item"><b>Категория</b>: {{ auto_part.auto_part_category.name }}
+                                <li class="list-group-item"><b>Цена</b>:
+                                    <span class="text-success">{{ auto_part.price|floatformat:"g" }} сум</span>
+                                </li>
+                            </ul>
+                            <div class="card-body" style="display: flex; gap: 5px;">
+                                <button
+                                        id="ap_{{ auto_part.id }}_minus"
+                                        data-auto-part-id="{{ auto_part.id }}"
+                                        class="btn btn-danger rounded-1"
+                                        onclick="minus(event)"
+                                >-
+                                </button>
+                                <button
+                                        id="ap_{{ auto_part.id }}_quantity"
+                                        class="btn btn-danger rounded-1"
+                                        style="flex: 1;"
+                                > 0
+                                </button>
+                                <button
+                                        id="ap_{{ auto_part.id }}_plus"
+                                        data-auto-part-id="{{ auto_part.id }}"
+                                        class="btn btn-danger rounded-1"
+                                        onclick="plus(event)"
+                                >+
+                                </button>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+
+        function modify(auto_part_id, val) {
+            let data = get_data()
+            if (data[auto_part_id])
+                data[auto_part_id] = data[auto_part_id] + val
+            else
+                data[auto_part_id] = val
+
+            if (data[auto_part_id] < 0)
+                data[auto_part_id] = 0
+
+            write_data(data)
+            render()
+        }
+
+        function plus(e) {
+            modify(
+                e.target.getAttribute('data-auto-part-id'),
+                1
+            )
+        }
+
+        function minus(e) {
+            modify(
+                e.target.getAttribute('data-auto-part-id'),
+                -1
+            )
+        }
+
+        function render() {
+            const data = get_data()
+            Object.entries(data).forEach(
+                (itm) => {
+                    document.getElementById(`ap_${itm[0]}_quantity`).innerHTML = itm[1]
+                }
+            )
+        }
+
+        window.addEventListener('load', function () {
+            render()
+        })
+    </script>
+    <!-- Market End -->
+{% endblock %}
+

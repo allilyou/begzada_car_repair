@@ -1,0 +1,158 @@
+{% extends 'main/base.html' %}
+
+
+{% block 'title' %}
+    Оформление заказа - Nukus Avto
+{% endblock %}
+
+
+
+{% block 'page_content' %}
+    <!-- Page Header Start -->
+    <div class="container-fluid page-header mb-5 p-0" style="background-image: url(static/img/carousel-bg-2.jpg);">
+        <div class="container-fluid page-header-inner py-5">
+            <div class="container text-center">
+                <h1 class="display-3 text-white mb-3 animated slideInDown">Заказать услугу / товар</h1>
+                <nav aria-label="breadcrumb">
+                </nav>
+            </div>
+        </div>
+    </div>
+    <!-- Page Header End -->
+
+
+    <!-- Service Start -->
+    <div class="container-xxl service py-5">
+        <div class="container">
+
+            {% if show_thanks %}
+                <div class="row">
+                    <div class="col">
+                        <h1 style="text-align: center;">
+                            Спасибо за бронь!
+                        </h1>
+                    </div>
+                </div>
+            {% endif %}
+
+            <div class="row">
+                <div class="col">
+                    <div style="display: flex; flex-wrap: wrap; gap: 15px;padding-top: 25px; padding-bottom: 25px;">
+                        {% for auto_part in auto_parts %}
+
+                            <div id="auto_part_{{ auto_part.id }}" class="card mb-3 d-none" style="width: 40%;">
+                                <div class="row g-0">
+                                    <div class="col-md-4">
+                                        <img
+                                                src="{{ auto_part.image.url }}"
+                                                class="img-fluid rounded-start"
+                                                alt="..."
+                                                style="height: 179px; width: 176px;"
+                                        >
+                                    </div>
+                                    <div class="col-md-8">
+                                        <div class="card-body">
+                                            <h5 class="card-title">{{ auto_part.name }}</h5>
+                                            <p class="card-text">
+                                                {{ auto_part.description }}
+                                            </p>
+                                            <p class="card-text"><small class="text-body-secondary">
+                                                <span class="quantity_span"></span> шт
+                                            </small></p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="bg-primary h-100 d-flex flex-column justify-content-center text-center"
+                     data-wow-delay="0.6s">
+                    <h1 class="text-white mb-4">Бронирование</h1>
+                    <form method="post">
+                        {% csrf_token %}
+                        <input type="hidden" id="local_storage_data_input" name="selected_auto_parts">
+                        <div class="row g-3">
+                            <div class="col-12 col-sm-6">
+                                <input type="text"
+                                       class="form-control border-0"
+                                       placeholder="Ваше имя"
+                                       style="height: 55px;"
+                                       name="name"
+                                       required
+                                >
+                            </div>
+                            <div class="col-12 col-sm-6">
+                                <input type="tel"
+                                       class="form-control border-0"
+                                       placeholder="Ваш номер телефона"
+                                       style="height: 55px;"
+                                       name="phone"
+                                       required
+                                >
+                            </div>
+                            <div class="col-12 col-sm-6">
+                                <select class="form-select border-0" style="height: 55px;" name="service">
+                                    <option selected>Диагностика</option>
+                                    <option value="Обслуживание двигателя">Обслуживание двигателя</option>
+                                    <option value="Шиномонтаж">Шиномонтаж</option>
+                                    <option value="Замена масла">Замена масла</option>
+                                    <option value="Работы электрика">Работы электрика</option>
+                                    <option value="Ходовая часть">Ходовая часть</option>
+                                    <option value="Мойка и полировка">Мойка и полировка</option>
+                                </select>
+                            </div>
+                            <div class="col-12 col-sm-6">
+                                <div class="date" id="date1" data-target-input="nearest">
+                                    <input type="text"
+                                           class="form-control border-0 datetimepicker-input"
+                                           placeholder="Выберите дату" data-target="#date1"
+                                           data-toggle="datetimepicker"
+                                           style="height: 55px;"
+                                           name="date"
+                                           required
+                                    >
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <textarea class="form-control border-0" placeholder="Примечание"></textarea>
+                            </div>
+                            <div class="col-12">
+                                <button type="submit" class="btn btn-secondary w-100 py-3" type="submit">Заказать
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        window.addEventListener('load', function () {
+
+            {% if do_clear_localStorage %}
+                write_data({})
+            {% endif %}
+
+            const data = get_data()
+
+            document.getElementById('local_storage_data_input').value = JSON.stringify(data)
+
+            Object.entries(data).forEach(
+                (itm) => {
+                    if (itm[1] > 0) {
+                        let card = document.getElementById(`auto_part_${itm[0]}`)
+                        card.querySelector('.quantity_span').innerHTML = itm[1]
+                        card.classList.remove('d-none')
+                    }
+                }
+            )
+        })
+    </script>
+    <!-- Service End -->
+{% endblock %}
